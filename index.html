@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Dots Wave</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Settings
+        const DOT_SIZE = 4;
+        const SPACING = 25;
+        const DOT_COLOR = '#000000';
+
+        // Set canvas size
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        class Dot {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.baseY = y;
+            }
+
+            update(frame) {
+                // Create wave motion
+                this.y = this.baseY + Math.sin(frame / 30 + this.x / 50) * 20;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, DOT_SIZE, 0, Math.PI * 2);
+                ctx.fillStyle = DOT_COLOR;
+                ctx.fill();
+            }
+        }
+
+        // Create grid of dots
+        let dots = [];
+        function createDots() {
+            dots = [];
+            for(let x = 0; x < canvas.width; x += SPACING) {
+                for(let y = 0; y < canvas.height; y += SPACING) {
+                    dots.push(new Dot(x, y));
+                }
+            }
+        }
+        createDots();
+
+        // Animation
+        let frame = 0;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            dots.forEach(dot => {
+                dot.update(frame);
+                dot.draw();
+            });
+
+            frame++;
+            requestAnimationFrame(animate);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            createDots();
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
